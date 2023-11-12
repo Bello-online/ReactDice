@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title> 🎲 React A Dice 🎲</title>
+    <link rel="icon" type="image/x-icon" href="Dice.JPG">
+    <!-- Load React. -->
+    <script
+      src="https://unpkg.com/react@17/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+        <h1> 🎲 React A' Dice 🎲</h1>
+        <p> 🤫 Click the "Number of dice" number to increase the number of dice</p>
+      </header>
+    <div class="app">
+        <div id="root"></div>
+    </div>
+    
+    <script type="text/babel" data-presets="react">
+
+        // App Component
+      class App extends React.Component {
+        constructor(props) {
+          super(props);
+
+          this.state = {
+            numberOfDice: 1,
+            numberOfSides: 6,
+            diceValues: Array(1).fill(1),
+          };
+        }
+
+        handleDiceIncrement = () => {
+          this.setState((prevState) => ({
+            numberOfDice: prevState.numberOfDice + 1,
+            diceValues: [...prevState.diceValues, 1],
+          }));
+        };
+
+        handleReset = () => {
+          this.setState({
+            numberOfDice: 1,
+            diceValues: [1],
+          });
+        };
+
+        handleSidesIncrement = () => {
+          this.setState((prevState) => ({
+            numberOfSides:
+              prevState.numberOfSides < 20
+                ? prevState.numberOfSides + 1
+                : prevState.numberOfSides,
+          }));
+        };
+
+        handleSidesDecrement = () => {
+          this.setState((prevState) => ({
+            numberOfSides:
+              prevState.numberOfSides > 1
+                ? prevState.numberOfSides - 1
+                : prevState.numberOfSides,
+          }));
+        };
+
+        handleDiceClick = (index) => {
+          this.setState((prevState) => {
+            const updatedDiceValues = [...prevState.diceValues];
+            updatedDiceValues[index] =
+              (updatedDiceValues[index] % prevState.numberOfSides) + 1;
+            return { diceValues: updatedDiceValues };
+          });
+        };
+
+        handleRoll = () => {
+          this.setState((prevState) => ({
+            diceValues: prevState.diceValues.map(
+              () => Math.floor(Math.random() * prevState.numberOfSides) + 1
+            ),
+          }));
+        };
+
+        render() {
+          const { numberOfDice, numberOfSides, diceValues } = this.state;
+
+          return (
+            <div className="app">
+              <ControlPanel
+                numberOfDice={numberOfDice}
+                onDiceIncrement={this.handleDiceIncrement}
+                onReset={this.handleReset}
+                numberOfSides={numberOfSides}
+                onSidesIncrement={this.handleSidesIncrement}
+                onSidesDecrement={this.handleSidesDecrement}
+                onRoll={this.handleRoll}
+              />
+              <div className="dice-container">
+                {diceValues.map((value, index) => (
+                  <Dice
+                    key={index}
+                    number={value}
+                    onClick={() => this.handleDiceClick(index)}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        }
+      }
+
+
+      // Dice Component
+      class Dice extends React.Component {
+        render() {
+          const { number, onClick } = this.props;
+
+          return (
+            <div className="dice" onClick={onClick}>
+              {number}
+            </div>
+          );
+        }
+      }
+
+      // Control Panel Component
+      class ControlPanel extends React.Component {
+        render() {
+          const {
+            numberOfDice,
+            onDiceIncrement,
+            onReset,
+            numberOfSides,
+            onSidesIncrement,
+            onSidesDecrement,
+            onRoll,
+          } = this.props;
+
+          return (
+            <div>
+              <div>
+                <label>Number of Dice</label>
+                <span onClick={onDiceIncrement} className="clickable-number">
+                  {numberOfDice}
+                </span>
+                <button onClick={onReset}>Reset</button>
+              </div>
+              <div>
+                <label>Number of Sides</label>
+                <button
+                  onClick={onSidesDecrement}
+                  disabled={numberOfSides === 1}
+                >
+                  -
+                </button>
+                <span>{numberOfSides}</span>
+                <button
+                  onClick={onSidesIncrement}
+                  disabled={numberOfSides === 20}
+                >
+                  +
+                </button>
+              </div>
+              <button onClick={onRoll}>Roll</button>
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+
+<footer>
+    &copy; 👑 2023 React A Dice @ Beni Apps
+  </footer>
+  </body>
+</html>
